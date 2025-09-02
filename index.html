@@ -17,8 +17,6 @@
       --card: rgba(0,0,0,.55);
       --border: rgba(255,255,255,.18);
       --shadow: 0 20px 60px rgba(0,0,0,.5);
-      --tintA: rgba(140,165,255,.10);
-      --tintB: rgba(220,160,255,.08);
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
@@ -30,14 +28,9 @@
     .softlight::after {
       content: ""; position: fixed; inset: -10vmax; pointer-events: none; z-index: -1;
       background:
-        radial-gradient(40vmax 30vmax at 70% 15%, var(--tintA), transparent 60%),
-        radial-gradient(35vmax 25vmax at 15% 85%, var(--tintB), transparent 60%);
-      mix-blend-mode: screen; filter: blur(10px) grayscale(100%);
-      animation: ambient 24s ease-in-out infinite alternate;
-    }
-    @keyframes ambient {
-      0%   { background-position: 70% 15%, 15% 85%; opacity: .85; }
-      100% { background-position: 60% 25%, 20% 75%; opacity: 1; }
+        radial-gradient(40vmax 30vmax at 70% 15%, rgba(255,255,255,.10), transparent 60%),
+        radial-gradient(35vmax 25vmax at 15% 85%, rgba(255,255,255,.08), transparent 60%);
+      mix-blend-mode: screen; filter: blur(8px) grayscale(100%);
     }
     .midline{
       position: fixed; top: 0; bottom: 0; left: 50%;
@@ -104,61 +97,21 @@
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    function pickLangFromCountry(c){
-      if(!c) return null;
-      c=c.toUpperCase();
-      const map={
-        UA:'uk', CZ:'cs', SK:'sk', PL:'pl', DE:'de', FR:'fr', ES:'es', PT:'pt', BR:'pt', IT:'it', NL:'nl',
-        NO:'no', SE:'sv', DK:'da', FI:'fi', IS:'is', RO:'ro', BG:'bg', HU:'hu', TR:'tr', GR:'el',
-        RU:'ru', KZ:'kk', GE:'ka', AM:'hy', AZ:'az', EE:'et', LT:'lt', LV:'lv',
-        US:'en', GB:'en', IE:'en', CA:'en', AU:'en', NZ:'en', IN:'en', SG:'en', PH:'en', ZA:'en',
-        CN:'zh-CN', TW:'zh-TW', HK:'zh-TW', JP:'ja', KR:'ko', VN:'vi', TH:'th', ID:'id', MY:'ms',
-        IL:'he', SA:'ar', AE:'ar', EG:'ar', IR:'fa'
-      };
-      return map[c]||null;
-    }
-
     function normalizeLang(l){
       if(!l) return null;
-      l=l.toLowerCase();
-      if(l.startsWith('zh-hant')||l.endsWith('tw')||l.endsWith('hk')) return 'zh-TW';
+      l = l.toLowerCase();
+      if(l.startsWith('zh-hant') || l.endsWith('tw') || l.endsWith('hk')) return 'zh-TW';
       if(l.startsWith('zh')) return 'zh-CN';
       return l.split('-')[0];
     }
 
-    window._targetLang = null;
-
-    (async function decideLang(){
-      try{
-        const r = await fetch('https://ipapi.co/json/');
-        if(r.ok){
-          const j = await r.json();
-          const fromCountry = pickLangFromCountry(j && (j.country || j.country_code));
-          if(fromCountry) window._targetLang = fromCountry;
-          if(!window._targetLang && j && j.languages){
-            const first = String(j.languages).split(',')[0].trim();
-            window._targetLang = normalizeLang(first);
-          }
-        }
-      }catch(e){}
-      if(!window._targetLang){
-        window._targetLang = normalizeLang(navigator.language || (navigator.languages && navigator.languages[0]));
-      }
-      if(!window._targetLang){ window._targetLang = 'en'; }
-      applyTranslation();
-    })();
-
     function applyTranslation(){
-      const lang = window._targetLang;
-      if(!window.google || !window.google.translate || !document.querySelector('.goog-te-combo')) {
-        setTimeout(applyTranslation, 200);
-        return;
-      }
-      if(!lang || lang==='en') return;
-      const sel = document.querySelector('.goog-te-combo');
-      if(!sel) { setTimeout(applyTranslation, 200); return; }
-      sel.value = lang;
-      sel.dispatchEvent(new Event('change'));
+      var lang = normalizeLang(navigator.language || (navigator.languages && navigator.languages[0]));
+      if(!lang || lang === 'en') return;
+      var combo = document.querySelector('.goog-te-combo');
+      if(!combo){ setTimeout(applyTranslation, 200); return; }
+      combo.value = lang;
+      combo.dispatchEvent(new Event('change'));
     }
 
     function googleTranslateElementInit(){
