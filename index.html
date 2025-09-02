@@ -27,10 +27,19 @@
     .softlight::before,
     .softlight::after {
       content: ""; position: fixed; inset: -10vmax; pointer-events: none; z-index: 0;
-      background:
-        radial-gradient(40vmax 30vmax at 70% 15%, rgba(255,255,255,.30), transparent 60%),
-        radial-gradient(35vmax 25vmax at 15% 85%, rgba(255,255,255,.22), transparent 60%);
       filter: blur(12px);
+    }
+    /* Calm cool light from top-right */
+    .softlight::before{
+      background:
+        radial-gradient(45vmax 35vmax at 85% 12%, rgba(120,160,255,.20), transparent 60%),
+        radial-gradient(35vmax 28vmax at 70% 20%, rgba(180,220,255,.12), transparent 65%);
+    }
+    /* Gentle warm glow from bottom-left */
+    .softlight::after{
+      background:
+        radial-gradient(50vmax 38vmax at 10% 90%, rgba(255,180,220,.18), transparent 62%),
+        radial-gradient(32vmax 26vmax at 20% 75%, rgba(255,220,200,.10), transparent 60%);
     }
     .midline{
       position: fixed; top: 0; bottom: 0; left: 50%;
