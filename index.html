@@ -28,18 +28,11 @@
     .softlight::after {
       content: ""; position: fixed; inset: -10vmax; pointer-events: none; z-index: 0;
       filter: blur(12px);
-    }
-    /* Calm cool light from top-right */
-    .softlight::before{
       background:
-        radial-gradient(45vmax 35vmax at 85% 12%, rgba(120,160,255,.20), transparent 60%),
-        radial-gradient(35vmax 28vmax at 70% 20%, rgba(180,220,255,.12), transparent 65%);
-    }
-    /* Gentle warm glow from bottom-left */
-    .softlight::after{
-      background:
-        radial-gradient(50vmax 38vmax at 10% 90%, rgba(255,180,220,.18), transparent 62%),
-        radial-gradient(32vmax 26vmax at 20% 75%, rgba(255,220,200,.10), transparent 60%);
+        var(--ambient-bg,
+          radial-gradient(40vmax 30vmax at 85% 12%, rgba(120,160,255,.20), transparent 60%),
+          radial-gradient(35vmax 28vmax at 10% 90%, rgba(255,180,220,.18), transparent 62%)
+        );
     }
     .midline{
       position: fixed; top: 0; bottom: 0; left: 50%;
@@ -158,6 +151,42 @@
       new google.translate.TranslateElement({pageLanguage:'en', autoDisplay:false}, 'google_translate_element');
       applyTranslation();
     }
+  </script>
+  <script>
+    (function(){
+      var root = document.documentElement;
+
+      function rand(min,max){ return Math.random()*(max-min)+min; }
+      var palette = [
+        [140,165,255],  // soft blue
+        [180,220,255],  // baby blue
+        [255,180,220],  // blush pink
+        [200,240,235],  // aqua mist
+        [210,200,255],  // lavender
+        [255,220,200],  // peach
+        [190,225,200],  // sage
+        [200,210,230]   // periwinkle grey
+      ];
+
+      var count = Math.floor(rand(7,11)); // 7–10 calm blobs
+      var layers = [];
+      for (var i=0; i<count; i++){
+        var c = palette[Math.floor(Math.random()*palette.length)];
+        var a = rand(0.08, 0.18);
+        var w = rand(26, 52);     // vmax width
+        var h = rand(22, 45);     // vmax height
+        var x = rand(0, 100);     // position %
+        var y = rand(0, 100);
+        var stop = rand(54, 68);  // fade-out distance
+        layers.push(
+          'radial-gradient(' + w.toFixed(2) + 'vmax ' + h.toFixed(2) + 'vmax at ' +
+          x.toFixed(2) + '% ' + y.toFixed(2) + '%, ' +
+          'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a.toFixed(2) + '), transparent ' +
+          stop.toFixed(2) + '%)'
+        );
+      }
+      root.style.setProperty('--ambient-bg', layers.join(', '));
+    })();
   </script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
