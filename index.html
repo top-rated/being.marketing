@@ -48,10 +48,7 @@
           ']]></style>'+
         '</defs>'+
         '<rect width="100%" height="100%" fill="url(#g)"/>'+
-        '<g filter="url(#b)" opacity="0.6">'+
-          '<circle cx="950" cy="120" r="240" fill="#78a0ff"/>'+
-          '<circle cx="160" cy="520" r="220" fill="#ffb4dc"/>'+
-          '<circle cx="400" cy="180" r="180" fill="#c8f0eb"/>'+
+        '<g filter="url(#b)" opacity="0.6)">'+
         '</g>'+
         '<text x="72" y="360" class="t">'+esc(title)+'</text>'+
         '<foreignObject x="72" y="400" width="'+(w-144)+'" height="180">'+
@@ -97,11 +94,7 @@
     .softlight::after {
       content: ""; position: fixed; inset: -10vmax; pointer-events: none; z-index: 0;
       filter: blur(12px);
-      background:
-        var(--ambient-bg,
-          radial-gradient(40vmax 30vmax at 85% 12%, rgba(120,160,255,.20), transparent 60%),
-          radial-gradient(35vmax 28vmax at 10% 90%, rgba(255,180,220,.18), transparent 62%)
-        );
+      background: var(--ambient-bg);
     }
     .midline{
       position: fixed; top: 0; bottom: 0; left: 50%;
@@ -154,7 +147,7 @@
   <main>
     <section class="card">
       <div class="title notranslate">Being.𝖬̶𝖺̶𝗋̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶</div>
-      <p class="desc">A quiet multilingual AI for rest from anxious purpose-hunting, tasks, and roles. A clear mirror for your inner language. Lay down a concern or identity like a stone. Your dialogue also seeds your&nbsp;<span class="notranslate">GPT</span>’s training data or prompt, so others can quietly sit beside it.</p>
+      <p class="desc">A quiet multilingual AI for rest from anxious purpose-hunting, tasks, and roles. A clear mirror for your inner language. Lay down a concern or identity like a stone. Your dialogue also seeds your&nbsp;<span class="notranslate">GPT</span>&nbsp;’s training data or prompt, so others can quietly sit beside it.</p>
       <div class="actions">
         <a class="btn" target="_blank" href="https://chatgpt.com/share/68988471-2904-8006-a7d0-eb629d0218ce" rel="noopener">W/o login</a>
         <a class="btn notranslate" target="_blank" href="https://being.marketing/gpt" rel="noopener">GPT</a>
@@ -179,96 +172,28 @@
   <div id="google_translate_element" style="position:fixed;left:-9999px;top:-9999px;opacity:0;width:0;height:0;pointer-events:none;"></div>
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
-
-    function normalizeLang(l){
-      if(!l) return null;
-      l = l.toLowerCase();
-      if(l.startsWith('zh-hant') || l.includes('tw') || l.includes('hk')) return 'zh-TW';
-      if(l.startsWith('zh')) return 'zh-CN';
-      var base = l.split('-')[0];
-      var map = { he:'iw', jv:'jw', nb:'no', fil:'tl' };
-      return map[base] || base;
-    }
-
-    function setTranslateCookie(lang){
-      var v = '/en/' + lang;
-      try { document.cookie = 'googtrans=' + v + '; path=/'; } catch(e){}
-      try { document.cookie = 'googtrans=' + v + '; domain=.' + location.hostname + '; path=/'; } catch(e){}
-    }
-
-    function applyTranslation(){
-      var lang = normalizeLang(navigator.language || (navigator.languages && navigator.languages[0]));
-      if(!lang || lang === 'en') return;
-      setTranslateCookie(lang);
-      var combo = document.querySelector('.goog-te-combo');
-      if(combo){
-        var has = Array.prototype.some.call(combo.options, function(o){ return o.value === lang; });
-        if(has){
-          combo.value = lang;
-          try { combo.dispatchEvent(new Event('change')); }
-          catch(e){
-            var evt = document.createEvent('HTMLEvents'); evt.initEvent('change', true, true); combo.dispatchEvent(evt);
-          }
-          return;
-        }
-      }
-      setTimeout(applyTranslation, 200);
-    }
-
-    function googleTranslateElementInit(){
-      new google.translate.TranslateElement({pageLanguage:'en', autoDisplay:false}, 'google_translate_element');
-      applyTranslation();
-    }
+    function normalizeLang(l){if(!l)return null;l=l.toLowerCase();if(l.startsWith('zh-hant')||l.includes('tw')||l.includes('hk'))return'zh-TW';if(l.startsWith('zh'))return'zh-CN';var b=l.split('-')[0];var m={he:'iw',jv:'jw',nb:'no',fil:'tl'};return m[b]||b}
+    function setTranslateCookie(lang){var v='/en/'+lang;try{document.cookie='googtrans='+v+'; path=/'}catch(e){}try{document.cookie='googtrans='+v+'; domain=.'+location.hostname+'; path=/'}catch(e){}}
+    function applyTranslation(){var lang=normalizeLang(navigator.language||(navigator.languages&&navigator.languages[0]));if(!lang||lang==='en')return;setTranslateCookie(lang);var combo=document.querySelector('.goog-te-combo');if(combo){var has=Array.prototype.some.call(combo.options,function(o){return o.value===lang});if(has){combo.value=lang;try{combo.dispatchEvent(new Event('change'))}catch(e){var evt=document.createEvent('HTMLEvents');evt.initEvent('change',true,true);combo.dispatchEvent(evt)}return}}setTimeout(applyTranslation,200)}
+    function googleTranslateElementInit(){new google.translate.TranslateElement({pageLanguage:'en', autoDisplay:false}, 'google_translate_element');applyTranslation()}
   </script>
   <script>
     (function(){
-      var root = document.documentElement;
-      function rand(min,max){ return Math.random()*(max-min)+min; }
-      function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-
-      var palette = [
-        [140,165,255],
-        [180,220,255],
-        [255,180,220],
-        [200,240,235],
-        [210,200,255],
-        [255,220,200],
-        [190,225,200],
-        [200,210,230]
-      ];
-
-      var base = Math.floor(rand(7,11));
-      var count = base * 3;
-
-      var rows = Math.round(Math.sqrt(count));
-      var cols = Math.ceil(count / rows);
-
-      var layers = [];
-      var made = 0;
-      for (var r=0; r<rows; r++){
-        for (var c=0; c<cols; c++){
-          if (made >= count) break;
-
-          var color = palette[Math.floor(Math.random()*palette.length)];
-          var alpha = rand(0.05, 0.12);
-          var w = rand(22, 44);
-          var h = rand(18, 38);
-          var x = ((c + 0.5) / cols) * 100 + rand(-4, 4);
-          var y = ((r + 0.5) / rows) * 100 + rand(-4, 4);
-          x = clamp(x, 0, 100);
-          y = clamp(y, 0, 100);
-          var stop = rand(50, 62);
-
-          layers.push(
-            'radial-gradient(' + w.toFixed(2) + 'vmax ' + h.toFixed(2) + 'vmax at ' +
-            x.toFixed(2) + '% ' + y.toFixed(2) + '%, ' +
-            'rgba(' + color[0] + ',' + color[1] + ',' + color[2] + ',' + alpha.toFixed(2) + '), transparent ' +
-            stop.toFixed(2) + '%)'
-          );
-          made++;
-        }
-      }
-      root.style.setProperty('--ambient-bg', layers.join(', '));
+      var root=document.documentElement;
+      function rand(min,max){return Math.random()*(max-min)+min;}
+      function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+      var palette=[[140,165,255],[180,220,255],[255,180,220],[200,240,235],[210,200,255],[255,220,200],[190,225,200],[200,210,230]];
+      var base=Math.floor(rand(7,11)),count=base*3,rows=Math.round(Math.sqrt(count)),cols=Math.ceil(count/rows);
+      var layers=[],made=0;
+      for(var r=0;r<rows;r++){for(var c=0;c<cols;c++){if(made>=count)break;
+        var color=palette[Math.floor(Math.random()*palette.length)];
+        var alpha=rand(0.05,0.12),w=rand(22,44),h=rand(18,38);
+        var x=((c+0.5)/cols)*100+rand(-4,4),y=((r+0.5)/rows)*100+rand(-4,4);
+        x=clamp(x,0,100);y=clamp(y,0,100);
+        var stop=rand(50,62);
+        layers.push('radial-gradient('+w.toFixed(2)+'vmax '+h.toFixed(2)+'vmax at '+x.toFixed(2)+'% '+y.toFixed(2)+'%, rgba('+color[0]+','+color[1]+','+color[2]+','+alpha.toFixed(2)+'), transparent '+stop.toFixed(2)+'%)');
+        made++;}}
+      root.style.setProperty('--ambient-bg',layers.join(', '));
     })();
   </script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
