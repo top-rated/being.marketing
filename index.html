@@ -17,6 +17,8 @@
       --card: rgba(0,0,0,.55);
       --border: rgba(255,255,255,.18);
       --shadow: 0 20px 60px rgba(0,0,0,.5);
+      --tintA: rgba(140,165,255,.10);
+      --tintB: rgba(220,160,255,.08);
     }
     * { box-sizing: border-box; }
     html, body { height: 100%; }
@@ -27,13 +29,19 @@
     .softlight::before,
     .softlight::after {
       content: ""; position: fixed; inset: -10vmax; pointer-events: none; z-index: -1;
-      background: radial-gradient(40vmax 30vmax at 70% 15%, rgba(255,255,255,.10), transparent 60%),
-                  radial-gradient(35vmax 25vmax at 15% 85%, rgba(255,255,255,.08), transparent 60%);
-      mix-blend-mode: screen; filter: blur(8px) grayscale(100%);
+      background:
+        radial-gradient(40vmax 30vmax at 70% 15%, var(--tintA), transparent 60%),
+        radial-gradient(35vmax 25vmax at 15% 85%, var(--tintB), transparent 60%);
+      mix-blend-mode: screen; filter: blur(10px) grayscale(100%);
+      animation: ambient 24s ease-in-out infinite alternate;
+    }
+    @keyframes ambient {
+      0%   { background-position: 70% 15%, 15% 85%; opacity: .85; }
+      100% { background-position: 60% 25%, 20% 75%; opacity: 1; }
     }
     .midline{
-      position: fixed; left: 0; right: 0; top: 50%;
-      height: 1px; background: #fff; opacity: .85; transform: translateY(-.5px);
+      position: fixed; top: 0; bottom: 0; left: 50%;
+      width: 1px; background: #fff; opacity: .85; transform: translateX(-.5px);
       z-index: -1; pointer-events: none;
     }
     main { width: min(980px, 92vw); margin: 8vh auto 10vh; display: grid; gap: clamp(18px, 3.2vw, 28px); }
@@ -59,7 +67,7 @@
       place-items: center;
       padding: 18px 10px;
       pointer-events: auto;
-      margin: 20px 0;
+      margin: 40px 0; /* a bit lower */
     }
     .foot { pointer-events: auto; background: rgba(0,0,0,.55); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; font-size: 12.5px; color: var(--muted); }
   </style>
