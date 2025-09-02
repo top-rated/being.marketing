@@ -30,6 +30,16 @@
     • The ambient photo is displayed if no video is present/loaded or motion is reduced.
   -->
   <style>
+    .title a { color: var(--text); text-decoration: none; display: inline; }
+.title a:hover,
+.title a:focus-visible {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 0.1em;
+  text-decoration-thickness: .06em;
+}
+.title a:visited { color: var(--text); }
+
     :root {
       --text: #fff;
       --muted: rgba(255,255,255,.75);
