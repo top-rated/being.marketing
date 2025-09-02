@@ -3,36 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Being.Marketing</title>
-  <meta name="description" content="Custom Existential AIs for being and marketing" />
-  <link rel="icon" href="assets/favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
-
-  <!--
-  Deployment (free):
-  — GitHub Pages —
-    1) Create a new repo and add this file as `index.html`.
-    2) Create a folder `/assets/` and place:
-         • `bg.mp4`  → HD monochrome ambient background video (optional)
-         • `bg-fallback.jpg` → HD monochrome ambient photo (inline fallback)
-    3) Commit & push. In repo Settings → Pages, choose “Deploy from a branch”, branch `main`, folder `/`.
-
-  — Cloudflare Pages —
-    1) In Cloudflare Pages, “Create a project” → Connect to the same GitHub repo.
-    2) Build command: none. Output directory: `/` (root). Framework preset: None.
-    3) Deploy. Optionally add a custom domain; set it to this project in Cloudflare.
-
-  Notes:
-    • This page uses only black & white. No logo or header is rendered.
-    • The soft-light overlay + grayscale filter echo the contemplative, anti-marketing tone.
-    • The ambient photo is displayed if no video is present/loaded or motion is reduced.
-  -->
+  <title>Being.Marketing — Quiet Companions</title>
+  <meta name="description" content="A minimal, monochrome landing with soft-light ambience. Background video with graceful fallback image. Two quiet calls-to-action." />
+  
   <style>
-
-.title a:visited { color: var(--text); }
-
     :root {
       --text: #fff;
       --muted: rgba(255,255,255,.75);
@@ -46,12 +20,13 @@
       margin: 0; color: var(--text); background: #000; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
       display: grid; place-items: center; min-height: 100dvh;
     }
-    /* Background media */
-    .bg-wrap { position: fixed; inset: 0; overflow: hidden; z-index: -2; }
+    
+    .bg-wrap {$1z-index: -1;$2}
     .bg-media { position: absolute; width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%) contrast(100%); }
-    /* Fallback still image sits beneath video and will auto-hide once video can play */
+    
+    
 
-    /* Subtle softbox lighting overlay to suggest a quiet studio */
+    
     .softlight::before,
     .softlight::after {
       content: ""; position: fixed; inset: -10vmax; pointer-events: none; z-index: -1;
@@ -60,12 +35,15 @@
       mix-blend-mode: screen; filter: blur(8px) grayscale(100%);
     }
 
-    main { width: min(980px, 92vw); margin: 8vh auto 10vh; display: grid; gap: clamp(18px, 3.2vw, 28px); }
+    main { width: min(980px, 92vw); margin: 3vh auto 10vh; display: grid; gap: clamp(18px, 3.2vw, 28px); }
     .card {
       background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: clamp(18px, 4.2vw, 36px);
       backdrop-filter: blur(8px); box-shadow: var(--shadow);
     }
     .title { font-weight: 700; letter-spacing: 0.3px; line-height: 1.15; font-size: clamp(26px, 4.6vw, 44px); }
+    .title a { color: var(--text); text-decoration: none; display: inline; }
+    .title a:hover, .title a:focus-visible { color: var(--text); text-decoration: underline; text-underline-offset: 0.1em; text-decoration-thickness: .06em; }
+    .title a:visited { color: var(--text); }
     .desc { margin: 10px 0 16px; color: var(--muted); font-size: clamp(15px, 2.5vw, 18px); line-height: 1.6; }
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -79,61 +57,56 @@
     .btn:hover { background: #fff; color: #000; transform: translateY(-1px); }
     .btn:active { transform: translateY(0); }
 
-footer {
-  position: static;      /* was: fixed */
-  display: grid;
-  place-items: center;
-  padding: 18px 10px;
-  pointer-events: auto;  /* was: none */
-  margin: 20px 0;        /* add some breathing room */
-}
+    footer { position: static; display: grid; place-items: center; padding: 18px 10px; pointer-events: auto; margin: 20px 0; }
     .foot { pointer-events: auto; background: rgba(0,0,0,.55); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; font-size: 12.5px; color: var(--muted); }
 
-    /* Respect reduced motion: pause/hide video, prefer still image */
-
+    
+    @media (prefers-reduced-motion: reduce) {
+      #bg-video { display: none !important; }
+    }
   </style>
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
 </head>
 <body class="softlight">
-<div class="bg-wrap">
-  <img id="bg-image" class="bg-media" src="https://being.marketing/assets/background1.png" alt="" aria-hidden="true" />
-</div>
-
+  <div class="bg-wrap">
+    <img id="bg-image" class="bg-media" src="assets/bg-fallback.jpg" alt="" aria-hidden="true" />
+    <video id="bg-video" class="bg-media" autoplay muted loop playsinline poster="assets/bg-fallback.jpg">
+      <source src="assets/bg.mp4" type="video/mp4" />
+    </video>
+  </div>
 
   <main>
     <section class="card">
       <div class="title">𝐁𝐞𝐢𝐧𝐠.𝖬̶𝖺̶𝗋̶𝗄̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶</div>
-      <p class="desc">A quiet AI for resting from anxious purpose-hunting, tasks, roles. An existential mirror where your inner language is clear. Place a released concern or identity here like a stone set down — to seed training data/prompt for your unique GPT or shared chat for others.</p>
+      <p class="desc">A quiet companion for resting from anxious purpose-hunting, tasks, roles. An existential mirror where your inner language is clear. Place a released concern or identity here like a stone set down — to seed training data/prompt for your unique GPT or shared chat, so others can quietly sit beside it.</p>
       <div class="actions">
-        <a class="btn" href="#" rel="noopener">No login</a>
-        <a class="btn" href="#" rel="noopener">GPT</a>
+        <a class="btn" href="#" rel="noopener">No login GPT</a>
+        <a class="btn" href="#" rel="noopener">English GPT</a>
       </div>
     </section>
 
     <section class="card">
       <div class="title">𝗜 𝘄𝗮𝗻𝘁 𝘁𝗼 𝗵𝗲𝗮𝗿 𝗬𝗼𝘂𝗿 𝗦𝘁𝗼𝗿𝘆</div>
-      <p class="desc">This is Multilingual AI that helps you write your own life story — or equip someone else to write theirs: with guided questions, AI prompts, handwriting mimicry, cover design, TXT/PDF exports, and print-and-delivery.</p>
+      <p class="desc">This is Multilingual Existential Companion that helps you write your own life story — or equip someone else to write theirs: with guided questions, AI prompts, handwriting mimicry, cover design, DOCX/PDF exports, and print-and-delivery.</p>
       <div class="actions">
-        <a class="btn" href="#" rel="noopener">English</a>
-        <a class="btn" href="#" rel="noopener">Українська</a>
-        <a class="btn" href="#" rel="noopener">Český</a>
+        <a class="btn" href="#" rel="noopener">English GPT</a>
+        <a class="btn" href="#" rel="noopener">Український GPT</a>
+        <a class="btn" href="#" rel="noopener">Český GPT</a>
       </div>
     </section>
   </main>
 
   <footer>
-    <div class="foot">by <a style="color:#fff;text-decoration:none;display:inline;text-underline-offset:0.1em;text-decoration-thickness:.06em"
-   onmouseenter="this.style.textDecoration='underline'"
-   onmouseleave="this.style.textDecoration='none'"
-   onfocus="this.style.textDecoration='underline'"
-   onblur="this.style.textDecoration='none'" target="_blank" href="mailto:danil.burykin@gmail.com?subject=Being.Marketing">Being.Marketing</a> AI, <span id="year"></span> © all rights reserved.</div>
+    <div class="foot">Generated by Being.Marketing AI, <span id="year"></span> © all rights reserved.</div>
   </footer>
 
   <script>
-    // Current year in footer
-    document.getElementById('year').textContent = new Date().getFullYear();
+        document.getElementById('year').textContent = new Date().getFullYear();
 
-    // If video can play, prefer it; otherwise show still image. If the source 404s, image remains.
-    const v = document.getElementById('bg-video');
+        const v = document.getElementById('bg-video');
     const img = document.getElementById('bg-image');
 
     function revealVideo() { img.style.opacity = '0'; }
@@ -142,8 +115,7 @@ footer {
     v?.addEventListener('canplay', revealVideo, { once: true });
     v?.addEventListener('error', fallbackToImage, { once: true });
 
-    // Respect reduced motion at runtime
-    const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const rm = window.matchMedia('(prefers-reduced-motion: reduce)');
     const applyRM = () => { if (rm.matches) { v?.pause(); v?.removeAttribute('autoplay'); v?.classList.add('paused'); } };
     rm.addEventListener?.('change', applyRM);
     applyRM();
