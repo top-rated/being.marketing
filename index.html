@@ -100,18 +100,36 @@
     function normalizeLang(l){
       if(!l) return null;
       l = l.toLowerCase();
-      if(l.startsWith('zh-hant') || l.endsWith('tw') || l.endsWith('hk')) return 'zh-TW';
+      if(l.startsWith('zh-hant') || l.includes('tw') || l.includes('hk')) return 'zh-TW';
       if(l.startsWith('zh')) return 'zh-CN';
-      return l.split('-')[0];
+      var base = l.split('-')[0];
+      var map = { he:'iw', jv:'jw', nb:'no', fil:'tl' };
+      return map[base] || base;
+    }
+
+    function setTranslateCookie(lang){
+      var v = '/en/' + lang;
+      try { document.cookie = 'googtrans=' + v + '; path=/'; } catch(e){}
+      try { document.cookie = 'googtrans=' + v + '; domain=.' + location.hostname + '; path=/'; } catch(e){}
     }
 
     function applyTranslation(){
       var lang = normalizeLang(navigator.language || (navigator.languages && navigator.languages[0]));
       if(!lang || lang === 'en') return;
+      setTranslateCookie(lang);
       var combo = document.querySelector('.goog-te-combo');
-      if(!combo){ setTimeout(applyTranslation, 200); return; }
-      combo.value = lang;
-      combo.dispatchEvent(new Event('change'));
+      if(combo){
+        var has = Array.prototype.some.call(combo.options, function(o){ return o.value === lang; });
+        if(has){
+          combo.value = lang;
+          try { combo.dispatchEvent(new Event('change')); }
+          catch(e){
+            var evt = document.createEvent('HTMLEvents'); evt.initEvent('change', true, true); combo.dispatchEvent(evt);
+          }
+          return;
+        }
+      }
+      setTimeout(applyTranslation, 200);
     }
 
     function googleTranslateElementInit(){
