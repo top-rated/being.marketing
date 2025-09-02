@@ -30,14 +30,7 @@
     • The ambient photo is displayed if no video is present/loaded or motion is reduced.
   -->
   <style>
-    .link a { color: var(--text); text-decoration: none; display: inline; }
-.link a:hover,
-.link a:focus-visible {
-  color: var(--text);
-  text-decoration: underline;
-  text-underline-offset: 0.1em;
-  text-decoration-thickness: .06em;
-}
+
 .title a:visited { color: var(--text); }
 
     :root {
@@ -133,7 +126,11 @@ footer {
   </main>
 
   <footer>
-    <div class="foot">by <div class-"link"><a target="_blank" href="mailto:danil.burykin@gmail.com?subject=Being.Marketing">Being.Marketing</a></div> AI, <span id="year"></span> © all rights reserved.</div>
+    <div class="foot">by <a style="color:#fff;text-decoration:none;display:inline;text-underline-offset:0.1em;text-decoration-thickness:.06em"
+   onmouseenter="this.style.textDecoration='underline'"
+   onmouseleave="this.style.textDecoration='none'"
+   onfocus="this.style.textDecoration='underline'"
+   onblur="this.style.textDecoration='none'" target="_blank" href="mailto:danil.burykin@gmail.com?subject=Being.Marketing">Being.Marketing</a> AI, <span id="year"></span> © all rights reserved.</div>
   </footer>
 
   <script>
