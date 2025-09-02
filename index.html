@@ -26,7 +26,7 @@
     }
     .softlight::before,
     .softlight::after {
-      content: ""; position: fixed; inset: -10vmax; pointer-events: none; z-index: -1;
+      content: ""; position: fixed; inset: -10vmax; pointer-events: none; z-index: 0;
       background:
         radial-gradient(40vmax 30vmax at 70% 15%, rgba(255,255,255,.10), transparent 60%),
         radial-gradient(35vmax 25vmax at 15% 85%, rgba(255,255,255,.08), transparent 60%);
@@ -64,6 +64,8 @@
     }
     .foot { pointer-events: auto; background: rgba(0,0,0,.55); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; font-size: 12.5px; color: var(--muted); }
 
+    main, footer { position: relative; z-index: 1; }
+
     /* Hide Google Translate UI */
     #goog-gt-tt,
     .goog-te-banner-frame,
@@ -81,7 +83,7 @@
 
   <main>
     <section class="card">
-      <div class="title notranslate">𝐁𝐞𝐢𝐧𝐠.𝖬̶𝖺̶𝗋̶𝗄̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶</div>
+      <div class="title notranslate">𝐁𝐞𝐢𝐧𝐠.𝖬̶𝖺̶𝗋̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶</div>
       <p class="desc">A quiet AI for resting from anxious purpose-hunting, tasks, roles. An existential mirror where your inner language is clear. Place a released concern or identity here like a stone set down — to seed training data/prompt for your unique GPT or shared chat for others.</p>
       <div class="actions">
         <a class="btn" href="#" rel="noopener">No login</a>
