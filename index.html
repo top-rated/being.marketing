@@ -169,11 +169,10 @@
         [200,210,230]   // periwinkle grey
       ];
 
-      // base 7–10, then x3 → 21–30 spots
-      var base = Math.floor(rand(7,11)); 
+      // 21–30 spots (как раньше), но меньше, прозрачнее и с чуть меньшим радиусом
+      var base = Math.floor(rand(7,11));
       var count = base * 3;
 
-      // Even-ish distribution via jittered grid
       var rows = Math.round(Math.sqrt(count));
       var cols = Math.ceil(count / rows);
 
@@ -182,16 +181,16 @@
       for (var r=0; r<rows; r++){
         for (var c=0; c<cols; c++){
           if (made >= count) break;
+
           var color = palette[Math.floor(Math.random()*palette.length)];
-          var alpha = rand(0.08, 0.18);
-          var w = rand(26, 52);    // vmax width (kept same calm levels)
-          var h = rand(22, 45);    // vmax height
-          // cell center with gentle jitter for randomness
-          var x = ((c + 0.5) / cols) * 100 + rand(-6, 6);
-          var y = ((r + 0.5) / rows) * 100 + rand(-6, 6);
+          var alpha = rand(0.05, 0.12);          // ниже прозрачность → больше чёрного
+          var w = rand(22, 44);                  // меньше ширина
+          var h = rand(18, 38);                  // меньше высота
+          var x = ((c + 0.5) / cols) * 100 + rand(-4, 4); // более равномерно
+          var y = ((r + 0.5) / rows) * 100 + rand(-4, 4);
           x = clamp(x, 0, 100);
           y = clamp(y, 0, 100);
-          var stop = rand(54, 68);
+          var stop = rand(50, 62);               // меньше радиус свечения
 
           layers.push(
             'radial-gradient(' + w.toFixed(2) + 'vmax ' + h.toFixed(2) + 'vmax at ' +
