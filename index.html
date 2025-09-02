@@ -63,6 +63,17 @@
       margin: 40px 0;
     }
     .foot { pointer-events: auto; background: rgba(0,0,0,.55); border: 1px solid var(--border); border-radius: 999px; padding: 8px 14px; font-size: 12.5px; color: var(--muted); }
+
+    /* Hide Google Translate UI */
+    #goog-gt-tt,
+    .goog-te-banner-frame,
+    .goog-te-balloon-frame,
+    iframe.skiptranslate,
+    .goog-logo-link,
+    .goog-te-gadget-icon,
+    .goog-te-gadget span { display: none !important; }
+    .goog-te-gadget { font-size:0 !important; }
+    html, body { top: 0 !important; }
   </style>
 </head>
 <body class="softlight">
@@ -79,7 +90,7 @@
     </section>
 
     <section class="card">
-      <div class="title">𝗜 𝘄𝗮𝗻𝘁 𝘁𝗼 𝗵𝗲𝗮𝗿 𝗬𝗼𝘂𝗿 𝗦𝘁𝗼𝗿𝘆</div>
+      <div class="title" translate="yes">I want to hear Your Story</div>
       <p class="desc">This is Multilingual AI that helps you write your own life story — or equip someone else to write theirs: with guided questions, AI prompts, handwriting mimicry, cover design, TXT/PDF exports, and print-and-delivery.</p>
       <div class="actions">
         <a class="btn notranslate" href="#" rel="noopener">English</a>
