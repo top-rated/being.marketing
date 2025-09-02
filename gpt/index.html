@@ -1,103 +1,160 @@
-<!doctype html>
+// Preview for bots, redirect for humans, Instagram interstitial, local /og.jpg
+const CONFIG = {
+  TARGET_URL: "https://chatgpt.com/share/6897d8e1-c600-8006-9ab2-52a3e92f76e0",
+  GPT_URL: "https://chatgpt.com/g/g-6893550fc0a48191ac25776982a20a3b-being-marketing?model=gpt-5-thinking",
+  ROOT_URL: "https://being.marketing/",
+  OG_TITLE: "𝐁𝐞𝐢𝐧𝐠.𝖬̶𝖺̶𝗋̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶",
+  OG_DESC:
+    "A quiet companion for resting from anxious purpose-hunting, tasks, roles. An existential mirror where your inner language is clear. Place a released concern or identity here like a stone set down — to seed training data/prompt for your unique GPT or shared chat, so others can quietly sit beside it.",
+  SOURCE_IMAGE: "https://web-assets.carrd.co/assets/images/image04.jpg",
+};
+
+const BOT_RE =
+  /(facebookexternalhit|facebot|Meta-ExternalAgent|Twitterbot|Slackbot|LinkedInBot|Discordbot|TelegramBot|WhatsApp|Pinterest|SkypeUriPreview|bitlybot|redditbot|ia_archiver|Applebot|Google-InspectionTool)/i;
+
+export default {
+  async fetch(request) {
+    const url = new URL(request.url);
+    const ua = request.headers.get("user-agent") || "";
+    const path = url.pathname;
+
+    // Serve OG image from our domain
+    if (path === "/og.jpg") {
+      const upstream = await fetch(CONFIG.SOURCE_IMAGE, {
+        headers: { accept: "image/*", "user-agent": ua || "facebookexternalhit/1.1" },
+        cf: { cacheTtl: 86400, cacheEverything: true },
+      });
+      if (!upstream.ok) return new Response(null, { status: 502 });
+
+      const res = new Response(upstream.body, upstream);
+      const len = upstream.headers.get("content-length");
+      res.headers.set("content-type", "image/jpeg");
+      if (len) res.headers.set("content-length", len);
+      res.headers.set("cache-control", "public, max-age=86400");
+      res.headers.delete("content-security-policy");
+      res.headers.delete("set-cookie");
+      if (request.method === "HEAD") return new Response(null, { headers: res.headers });
+      return res;
+    }
+
+    const isRoot = path === "/";
+    const isGpt = path === "/gpt";
+    const targetUrl = isGpt ? CONFIG.GPT_URL : CONFIG.TARGET_URL;
+
+    // Other paths → /
+    if (!isRoot && !isGpt) {
+      return new Response(null, {
+        status: 302,
+        headers: { location: CONFIG.ROOT_URL, "cache-control": "no-store, no-cache, must-revalidate" },
+      });
+    }
+
+    // Instagram interstitial (in-app browser quirks)
+    if (/Instagram/i.test(ua)) {
+      const html = interstitialCard({
+        title: CONFIG.OG_TITLE,
+        desc: CONFIG.OG_DESC,
+        img: `${url.origin}/og.jpg`,
+        href: targetUrl,
+      });
+      return new Response(html, {
+        headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-store, no-cache, must-revalidate" },
+      });
+    }
+
+    // Bots → tiny HTML with our OG/Twitter tags (no redirect)
+    if (BOT_RE.test(ua)) {
+      const html = botPreviewHtml({
+        title: CONFIG.OG_TITLE,
+        desc: CONFIG.OG_DESC,
+        img: `${url.origin}/og.jpg`,
+        ogUrl: isGpt ? `${url.origin}/gpt` : `${url.origin}/`,
+        canonical: targetUrl,
+      });
+      if (request.method === "HEAD") return new Response(null, { headers: metaHeaders(html.length) });
+      return new Response(html, { headers: metaHeaders(html.length) });
+    }
+
+    // Humans → 302 to target (no-store)
+    return new Response(null, {
+      status: 302,
+      headers: { location: targetUrl, "cache-control": "no-store, no-cache, must-revalidate" },
+    });
+  }
+};
+
+// ---------- HTML helpers ----------
+function botPreviewHtml({ title, desc, img, ogUrl, canonical }) {
+  return `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>${esc(title)}</title>
+<link rel="canonical" href="${canonical}">
+<meta name="description" content="${esc(desc)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(desc)}">
+<meta property="og:image" content="${img}">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:url" content="${ogUrl}">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(title)}">
+<meta name="twitter:description" content="${esc(desc)}">
+<meta name="twitter:image" content="${img}">
+<meta name="robots" content="noindex,follow">
+</head><body></body></html>`;
+}
+
+function interstitialCard({ title, desc, img, href }) {
+  return `<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>𝐁𝐞𝐢𝐧𝐠.𝖬̶𝖺̶𝗋̶𝗄̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶</title>
-  <meta name="description" content="You are being redirected to the destination page.">
-
-  <!-- same preview meta and dynamic OG image as on the main page -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="">
-  <meta property="og:site_name" content="𝐁𝐞𝐢𝐧𝐠.𝖬̶𝖺̶𝗋̶𝗄̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶">
-  <meta property="og:title" content="𝐁𝐞𝐢𝐧𝐠.𝖬̶𝖺̶𝗋̶𝗄̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶">
-  <meta property="og:description" content="A quiet AI for rest from anxious purpose-hunting, tasks, and roles. A clear mirror for your inner language. Lay down a concern or identity like a stone. Your dialogue also seeds your GPT’s training data or prompt, so others can quietly sit beside it.">
-  <meta property="og:image" content="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fbeing.marketing%2F?w=1200&amp;h=630">
-  <meta property="og:image:secure_url" content="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fbeing.marketing%2F?w=1200&amp;h=630">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="𝐁𝐞𝐢𝐧𝐠.𝖬̶𝖺̶𝗋̶𝗄̶𝖾̶𝗍̶𝗂̶𝗇̶𝗀̶">
-  <meta name="twitter:description" content="A quiet AI for rest from anxious purpose-hunting, tasks, and roles. A clear mirror for your inner language. Lay down a concern or identity like a stone. Your dialogue also seeds your GPT’s training data or prompt, so others can quietly sit beside it.">
-  <meta name="twitter:image" content="https://s.wordpress.com/mshots/v1/https%3A%2F%2Fbeing.marketing%2F?w=1200&amp;h=630">
-
-  <script>
-    (function(){
-      var w=1200,h=630;
-      function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
-      function setMeta(key,attr,value){
-        var sel=attr==="name"?'meta[name="'+key+'"]':'meta[property="'+key+'"]';
-        var m=document.querySelector(sel);
-        if(!m){m=document.createElement("meta");m.setAttribute(attr,key);document.head.appendChild(m)}
-        m.setAttribute("content",value)
-      }
-      var title=document.title||"";
-      var descMeta=document.querySelector('meta[name="description"]');
-      var desc=descMeta?descMeta.getAttribute("content"):"";
-      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'+
-        '<defs>'+
-          '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'+
-            '<stop offset="0" stop-color="#0b0b0f"/>'+
-            '<stop offset="1" stop-color="#141416"/>'+
-          '</linearGradient>'+
-          '<filter id="b" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="60"/></filter>'+
-          '<style><![CDATA['+
-            '.t{font:700 72px ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial;fill:#fff}'+
-            '.d{font:400 32px ui-sans-serif,-apple-system,Segoe UI,Roboto,Helvetica,Arial;fill:#cfd2d9}'+
-          ']]></style>'+
-        '</defs>'+
-        '<rect width="100%" height="100%" fill="url(#g)"/>'+
-        '<g filter="url(#b)" opacity="0.6">'+
-          '<circle cx="950" cy="120" r="240" fill="#78a0ff"/>'+
-          '<circle cx="160" cy="520" r="220" fill="#ffb4dc"/>'+
-          '<circle cx="400" cy="180" r="180" fill="#c8f0eb"/>'+
-        '</g>'+
-        '<text x="72" y="360" class="t">'+esc(title)+'</text>'+
-        '<foreignObject x="72" y="400" width="'+(w-144)+'" height="180">'+
-          '<div xmlns="http://www.w3.org/1999/xhtml" style="line-height:1.35" class="d">'+esc(desc)+'</div>'+
-        '</foreignObject>'+
-      '</svg>';
-      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
-      var img=new Image();
-      img.onload=function(){
-        var c=document.createElement("canvas");
-        c.width=w;c.height=h;
-        var ctx=c.getContext("2d");
-        ctx.drawImage(img,0,0);
-        var png=c.toDataURL("image/png");
-        setMeta("og:image","property",png);
-        setMeta("twitter:image","name",png)
-      };
-      img.src=svgUrl
-    })();
-  </script>
-
-  <!-- те же favicon, без изменений -->
-  <link rel="icon" href="https://chatgpt.com/backend-api/estuary/content?id=file-RZp9nhpBFU5TCoeVURCEyx&gizmo_id=g-6893550fc0a48191ac25776982a20a3b&ts=488011&p=gpp&cid=1&sig=935cbc14b8fd3873dea2e55b319e88560c27cedacd2391630615e661090ab929" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="https://chatgpt.com/backend-api/estuary/content?id=file-RZp9nhpBFU5TCoeVURCEyx&gizmo_id=g-6893550fc0a48191ac25776982a20a3b&ts=488011&p=gpp&cid=1&sig=935cbc14b8fd3873dea2e55b319e88560c27cedacd2391630615e661090ab929">
-  <link rel="icon" type="image/png" sizes="192x192" href="https://chatgpt.com/backend-api/estuary/content?id=file-RZp9nhpBFU5TCoeVURCEyx&gizmo_id=g-6893550fc0a48191ac25776982a20a3b&ts=488011&p=gpp&cid=1&sig=935cbc14b8fd3873dea2e55b319e88560c27cedacd2391630615e661090ab929">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://chatgpt.com/backend-api/estuary/content?id=file-RZp9nhpBFU5TCoeVURCEyx&gizmo_id=g-6893550fc0a48191ac25776982a20a3b&ts=488011&p=gpp&cid=1&sig=935cbc14b8fd3873dea2e55b319e88560c27cedacd2391630615e661090ab929">
-
-  <meta http-equiv="refresh" content="0; url=https://chat.openai.com/g/g-6893550fc0a48191ac25776982a20a3b-being-marketing?model=gpt-5-thinking">
-  <script>
-    (function(){
-      var REDIRECT_TO = "https://chat.openai.com/g/g-6893550fc0a48191ac25776982a20a3b-being-marketing?model=gpt-5-thinking";
-      try { document.querySelector('meta[property="og:url"]').setAttribute('content', REDIRECT_TO); } catch(e){}
-      if (location.href !== REDIRECT_TO) {
-        window.location.replace(REDIRECT_TO);
-      }
-    })();
-  </script>
-
-  <style>
-    body{margin:0;display:grid;place-items:center;height:100dvh;background:#000;color:#fff;font:16px/1.4 ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    a{color:#fff;text-decoration:underline}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="0;url=${href}">
+<title>Opening…</title>
+<meta name="robots" content="noindex">
+<style>
+  :root{--bg:#0b0b0b;--fg:#eaeaea;--muted:#b6b6b6;--card:#161616}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto}
+  .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+  .card{width:min(680px,100%);background:var(--card);border-radius:20px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.4)}
+  .img{display:block;width:100%;aspect-ratio:1200/630;object-fit:cover}
+  .body{padding:16px 18px}
+  .title{font-weight:700;font-size:20px;margin:0 0 6px}
+  .desc{color:var(--muted);margin:0}
+  a.stretched{display:block;text-decoration:none;color:inherit}
+  .hint{margin-top:10px;text-align:center;color:var(--muted);font-size:14px}
+</style>
+<script>setTimeout(function(){location.replace(${JSON.stringify(href)});}, 60);</script>
 </head>
 <body>
-  <p>Redirecting… If nothing happens, <a href="https://chat.openai.com/g/g-6893550fc0a48191ac25776982a20a3b-being-marketing?model=gpt-5-thinking" rel="noopener">follow this link</a>.</p>
+  <div class="wrap">
+    <a class="stretched" href="${href}" target="_top" rel="noopener">
+      <div class="card">
+        <img class="img" src="${img}" alt="Preview">
+        <div class="body">
+          <h1 class="title">${esc(title)}</h1>
+          <p class="desc">${esc(desc)}</p>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="hint">Tap the card if it didn’t open automatically.</div>
 </body>
-</html>
+</html>`;
+}
+
+function metaHeaders(len) {
+  return {
+    "content-type": "text/html; charset=utf-8",
+    "cache-control": "public, max-age=300",
+    "vary": "user-agent",
+    "x-proxied-by": "cf-worker",
+    "content-length": String(len),
+  };
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+}
