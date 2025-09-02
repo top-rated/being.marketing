@@ -155,8 +155,9 @@
   <script>
     (function(){
       var root = document.documentElement;
-
       function rand(min,max){ return Math.random()*(max-min)+min; }
+      function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+
       var palette = [
         [140,165,255],  // soft blue
         [180,220,255],  // baby blue
@@ -168,22 +169,38 @@
         [200,210,230]   // periwinkle grey
       ];
 
-      var count = Math.floor(rand(7,11)); // 7–10 calm blobs
+      // base 7–10, then x3 → 21–30 spots
+      var base = Math.floor(rand(7,11)); 
+      var count = base * 3;
+
+      // Even-ish distribution via jittered grid
+      var rows = Math.round(Math.sqrt(count));
+      var cols = Math.ceil(count / rows);
+
       var layers = [];
-      for (var i=0; i<count; i++){
-        var c = palette[Math.floor(Math.random()*palette.length)];
-        var a = rand(0.08, 0.18);
-        var w = rand(26, 52);     // vmax width
-        var h = rand(22, 45);     // vmax height
-        var x = rand(0, 100);     // position %
-        var y = rand(0, 100);
-        var stop = rand(54, 68);  // fade-out distance
-        layers.push(
-          'radial-gradient(' + w.toFixed(2) + 'vmax ' + h.toFixed(2) + 'vmax at ' +
-          x.toFixed(2) + '% ' + y.toFixed(2) + '%, ' +
-          'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a.toFixed(2) + '), transparent ' +
-          stop.toFixed(2) + '%)'
-        );
+      var made = 0;
+      for (var r=0; r<rows; r++){
+        for (var c=0; c<cols; c++){
+          if (made >= count) break;
+          var color = palette[Math.floor(Math.random()*palette.length)];
+          var alpha = rand(0.08, 0.18);
+          var w = rand(26, 52);    // vmax width (kept same calm levels)
+          var h = rand(22, 45);    // vmax height
+          // cell center with gentle jitter for randomness
+          var x = ((c + 0.5) / cols) * 100 + rand(-6, 6);
+          var y = ((r + 0.5) / rows) * 100 + rand(-6, 6);
+          x = clamp(x, 0, 100);
+          y = clamp(y, 0, 100);
+          var stop = rand(54, 68);
+
+          layers.push(
+            'radial-gradient(' + w.toFixed(2) + 'vmax ' + h.toFixed(2) + 'vmax at ' +
+            x.toFixed(2) + '% ' + y.toFixed(2) + '%, ' +
+            'rgba(' + color[0] + ',' + color[1] + ',' + color[2] + ',' + alpha.toFixed(2) + '), transparent ' +
+            stop.toFixed(2) + '%)'
+          );
+          made++;
+        }
       }
       root.style.setProperty('--ambient-bg', layers.join(', '));
     })();
