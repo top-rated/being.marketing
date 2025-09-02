@@ -57,7 +57,7 @@
           ']]></style>'+
         '</defs>'+
         '<rect width="100%" height="100%" fill="url(#g)"/>'+
-        '<g filter="url(#b)" opacity="0.6">'+
+        '<g filter="url(#b)" opacity="0.6)">'+
           '<circle cx="950" cy="120" r="240" fill="#78a0ff"/>'+
           '<circle cx="160" cy="520" r="220" fill="#ffb4dc"/>'+
           '<circle cx="400" cy="180" r="180" fill="#c8f0eb"/>'+
@@ -82,9 +82,9 @@
     })();
   </script>
 
-  <link rel="icon" href="assets/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/favicon-192.png">
+  <link rel="icon" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20256%20256%22%3E%3Crect width=%22256%22 height=%22256%22 rx=%2256%22 fill=%22%230b0b0f%22/%3E%3Cg opacity=%220.6%22%3E%3Ccircle cx=%22200%22 cy=%2256%22 r=%2290%22 fill=%22%2378a0ff%22/%3E%3Ccircle cx=%2264%22 cy=%22200%22 r=%2280%22 fill=%22%23ffb4dc%22/%3E%3C/g%3E%3Ctext x=%2250%25%22 y=%2258%25%22 text-anchor=%22middle%22 font-family=%22ui-sans-serif,-apple-system,Segoe%20UI,Roboto,Helvetica,Arial%22 font-size=%22144%22 font-weight=%22700%22 fill=%22%23ffffff%22%3EB%3C/text%3E%3C/svg%3E" sizes="any">
+  <link rel="icon" type="image/svg+xml" sizes="32x32" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%2032%2032%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%230b0b0f%22/%3E%3Cg opacity=%220.6%22%3E%3Ccircle cx=%2226%22 cy=%225%22 r=%2211%22 fill=%22%2378a0ff%22/%3E%3Ccircle cx=%228%22 cy=%2226%22 r=%229%22 fill=%22%23ffb4dc%22/%3E%3C/g%3E%3Ctext x=%2250%25%22 y=%2259%25%22 text-anchor=%22middle%22 font-family=%22ui-sans-serif,-apple-system,Segoe%20UI,Roboto,Helvetica,Arial%22 font-size=%2218%22 font-weight=%22700%22 fill=%22%23ffffff%22%3EB%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" sizes="192x192" href="data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%200%20192%20192%22%3E%3Crect width=%22192%22 height=%22192%22 rx=%2242%22 fill=%22%230b0b0f%22/%3E%3Cg opacity=%220.6%22%3E%3Ccircle cx=%22150%22 cy=%2238%22 r=%2268%22 fill=%22%2378a0ff%22/%3E%3Ccircle cx=%2248%22 cy=%22152%22 r=%2262%22 fill=%22%23ffb4dc%22/%3E%3C/g%3E%3Ctext x=%2250%25%22 y=%2258%25%22 text-anchor=%22middle%22 font-family=%22ui-sans-serif,-apple-system,Segoe%20UI,Roboto,Helvetica,Arial%22 font-size=%22108%22 font-weight=%22700%22 fill=%22%23ffffff%22%3EB%3C/text%3E%3C/svg%3E">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
   <style>
     .title a:visited { color: var(--text); }
@@ -251,7 +251,7 @@
       var rows = Math.round(Math.sqrt(count));
       var cols = Math.ceil(count / rows);
 
-      var layers = [];
+      var spots = [];
       var made = 0;
       for (var r=0; r<rows; r++){
         for (var c=0; c<cols; c++){
@@ -267,16 +267,34 @@
           y = clamp(y, 0, 100);
           var stop = rand(50, 62);
 
-          layers.push(
-            'radial-gradient(' + w.toFixed(2) + 'vmax ' + h.toFixed(2) + 'vmax at ' +
-            x.toFixed(2) + '% ' + y.toFixed(2) + '%, ' +
-            'rgba(' + color[0] + ',' + color[1] + ',' + color[2] + ',' + alpha.toFixed(2) + '), transparent ' +
-            stop.toFixed(2) + '%)'
-          );
+          spots.push({
+            color: 'rgba(' + color[0] + ',' + color[1] + ',' + color[2] + ',' + alpha.toFixed(2) + ')',
+            w: w, h: h, x: x, y: y, stop: stop,
+            ax: rand(1.0, 3.2), ay: rand(1.0, 3.2),
+            sx: rand(0.06, 0.16), sy: rand(0.06, 0.16),
+            phx: rand(0, Math.PI*2), phy: rand(0, Math.PI*2)
+          });
           made++;
         }
       }
-      root.style.setProperty('--ambient-bg', layers.join(', '));
+
+      function frame(t){
+        var sec = t/1000;
+        var layers = [];
+        for (var i=0; i<spots.length; i++){
+          var s = spots[i];
+          var xx = clamp(s.x + Math.sin(sec * s.sx + s.phx) * s.ax, 0, 100);
+          var yy = clamp(s.y + Math.cos(sec * s.sy + s.phy) * s.ay, 0, 100);
+          layers.push(
+            'radial-gradient(' + s.w.toFixed(2) + 'vmax ' + s.h.toFixed(2) + 'vmax at ' +
+            xx.toFixed(2) + '% ' + yy.toFixed(2) + '%, ' +
+            s.color + ', transparent ' + s.stop.toFixed(2) + '%)'
+          );
+        }
+        root.style.setProperty('--ambient-bg', layers.join(', '));
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
     })();
   </script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
