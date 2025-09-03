@@ -196,17 +196,40 @@
       var root=document.documentElement;
       function rand(min,max){return Math.random()*(max-min)+min;}
       function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
-      var palette=[[140,165,255],[180,220,255],[255,180,220],[200,240,235],[210,200,255],[255,220,200],[190,225,200],[200,210,230]];
+
+      var palette=[
+        [120,150,255],  // deeper blue
+        [120,200,255],  // cyan-blue
+        [255,120,200],  // magenta-pink
+        [120,220,210],  // teal
+        [170,150,255],  // violet
+        [255,160,120],  // peach
+        [110,200,160],  // sea green
+        [150,180,230]   // soft indigo
+      ];
+
       var base=Math.floor(rand(7,11)),count=base*3,rows=Math.round(Math.sqrt(count)),cols=Math.ceil(count/rows);
       var layers=[],made=0;
-      for(var r=0;r<rows;r++){for(var c=0;c<cols;c++){if(made>=count)break;
-        var color=palette[Math.floor(Math.random()*palette.length)];
-        var alpha=rand(0.14,0.26),w=rand(20,38),h=rand(16,32);
-        var x=((c+0.5)/cols)*100+rand(-4,4),y=((r+0.5)/rows)*100+rand(-4,4);
-        x=clamp(x,0,100);y=clamp(y,0,100);
-        var stop=rand(58,70);
-        layers.push('radial-gradient('+w.toFixed(2)+'vmax '+h.toFixed(2)+'vmax at '+x.toFixed(2)+'% '+y.toFixed(2)+'%, rgba('+color[0]+','+color[1]+','+color[2]+','+alpha.toFixed(2)+'), transparent '+stop.toFixed(2)+'%)');
-        made++;}}
+      for(var r=0;r<rows;r++){
+        for(var c=0;c<cols;c++){
+          if(made>=count)break;
+
+          var color=palette[Math.floor(Math.random()*palette.length)];
+          var alpha=rand(0.22,0.36);
+          var w=rand(18,34),h=rand(14,30);
+          var x=((c+0.5)/cols)*100+rand(-4,4),y=((r+0.5)/rows)*100+rand(-4,4);
+          x=clamp(x,0,100);y=clamp(y,0,100);
+          var stop=rand(48,58);
+
+          layers.push(
+            'radial-gradient('+
+              w.toFixed(2)+'vmax '+h.toFixed(2)+'vmax at '+
+              x.toFixed(2)+'% '+y.toFixed(2)+'%, '+
+              'rgba('+color[0]+','+color[1]+','+color[2]+','+alpha.toFixed(2)+'), transparent '+stop.toFixed(2)+'%)'
+          );
+          made++;
+        }
+      }
       root.style.setProperty('--ambient-bg',layers.join(', '));
     })();
   </script>
